@@ -1,4 +1,5 @@
 ﻿using Snake_And_Ladder;
+using System;
 
 class Program
 {
@@ -10,61 +11,54 @@ class Program
 
         snake snake = new snake();
         ladder ladder = new ladder();
-        char userInput;
         char Exit = 'q';
-        int CurrentPosition = 0;
+        int[] playerPositions = { 0, 0 }; 
         Random random = new Random();
+        int currentPlayer = 0;
 
         do
         {
-            if (CurrentPosition <= 100)
+            Console.WriteLine($"Player {currentPlayer + 1}'s turn");
+            Console.WriteLine("Press any key to roll the dice...");
+            Console.ReadKey();
+
+            int randomNumber = random.Next(1, 7);
+            Console.WriteLine($"Player {currentPlayer + 1} rolled a {randomNumber}!");
+
+            playerPositions[currentPlayer] =playerPositions[currentPlayer]+ randomNumber;
+            int tempPosition = playerPositions[currentPlayer];
+            
+            playerPositions[currentPlayer] = snake.Snake_Position(playerPositions[currentPlayer]);
+            if (playerPositions[currentPlayer] < tempPosition)
             {
-                int randomNumber = random.Next(1, 7);
-                Console.WriteLine($"You rolled a {randomNumber}!");
-
-                CurrentPosition += randomNumber;
-                int previousPosition = CurrentPosition;
-                CurrentPosition = snake.Snake_Position(CurrentPosition);
-                if (CurrentPosition < previousPosition)
-                {
-                    Console.WriteLine("You landed on a snake! Moves behind to position:{0}", CurrentPosition);
-                }
-                CurrentPosition = ladder.Ladder_Position(CurrentPosition);
-                if (previousPosition < CurrentPosition)
-                {
-                    Console.WriteLine("Player landed on a ladder! Moves ahead to position:{0}", CurrentPosition);
-
-                }
-                if (CurrentPosition > 100)
-                {
-                    CurrentPosition -= randomNumber;
-                }
-                if (previousPosition == CurrentPosition)
-                {
-                    Console.WriteLine("Your current position is:{0}", CurrentPosition);
-                }
-                
-
-               
-                Console.WriteLine();
-
-                if (CurrentPosition == 100)
-                {
-                    Console.WriteLine("Congratulations! You win!");
-                }
+                Console.WriteLine($"Player {currentPlayer + 1} landed on a snake! Moves behind to position: {playerPositions[currentPlayer]}");
+            }
+            playerPositions[currentPlayer] = ladder.Ladder_Position(playerPositions[currentPlayer]);
+            if (tempPosition < playerPositions[currentPlayer])
+            {
+                Console.WriteLine($"Player {currentPlayer + 1} landed on a ladder! Moves ahead to position: {playerPositions[currentPlayer]}");
+            }
+            if (playerPositions[currentPlayer] > 100)
+            {
+                playerPositions[currentPlayer] = playerPositions[currentPlayer] - randomNumber;
+            }
+            if (tempPosition == playerPositions[currentPlayer])
+            {
+                Console.WriteLine($"Player {currentPlayer + 1}'s current position is: {playerPositions[currentPlayer]}");
             }
 
-            if (CurrentPosition != 100)
+            Console.WriteLine();
+
+            if (playerPositions[currentPlayer] == 100)
             {
-                Console.WriteLine("Press any key to continue or 'q' to exit:");
-                userInput = Console.ReadKey().KeyChar;
-                Console.WriteLine();
-            }
-            else
-            {
-                userInput = 'q';
+                Console.WriteLine($"Congratulations! Player {currentPlayer + 1} wins!");
+                break; 
             }
 
-        } while (Exit != userInput);
+            currentPlayer = 1 - currentPlayer;
+
+        } while (Exit != Console.ReadKey().KeyChar);
+
+        Console.WriteLine("Game Over!");
     }
 }
